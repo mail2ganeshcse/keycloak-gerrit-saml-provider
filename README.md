@@ -26,7 +26,7 @@ HTTPS protocol must be configured.
   $ cd keycloak/docker-compose-examples
   $ docker-compose -f keycloak-postgres.yml up
 ```
-2. To Disabled the HTTPS/SSL follow the below to disabled it on DB
+2. To Disable HTTPS/SSL on Keycloak follow the below steps on DB
 
 Connect to the docker container
 docker exec -it postgres /bin/sh
