@@ -26,14 +26,29 @@ HTTPS protocol must be configured.
   $ cd keycloak/docker-compose-examples
   $ docker-compose -f keycloak-postgres.yml up
 ```
+2. To Disabled the HTTPS/SSL follow the below to disabled it on DB
 
-2. Login to Keycloak using admin/Pa55w0rd credentials and import keycloak
+Connect to the docker container
+docker exec -it postgres /bin/sh
+
+and then execute
+psql -U keycloak -d keycloak
+
+keycloak=# select * from realm;
+
+In realm table, ssl_required is EXTERNAL by default. Set it to NONE
+
+keycloak=# update realm set ssl_required='NONE';
+
+exit from the container and restart keycloak (must)
+
+3. Login to Keycloak using admin/Pa55w0rd credentials and import keycloak
 [json file](../master/resources/keycloak-gerrit-client-export.json).
 
-3. Create test user: John Doe, with username "jdoe", email: john@doe.org, with
+4. Create test user: John Doe, with username "jdoe", email: john@doe.org, with
 password "secret", Temporary=OFF.
 
-4. Configure gerrit according to provided [gerrit.config](../master/resources/gerrit.config).
+5. Configure gerrit according to provided [gerrit.config](../master/resources/gerrit.config).
 Note this Keycloak SAML provider configuration section:
 
 ```
@@ -51,7 +66,7 @@ Note this Keycloak SAML provider configuration section:
     lastNameAttr = lastName
 ```
 
-5. Generate keystore in `$gerrit_site/etc` local keystore:
+6. Generate keystore in `$gerrit_site/etc` local keystore:
 
 ```
 keytool -genkeypair -alias pac4j -keypass pac4j-demo-password \
@@ -59,14 +74,14 @@ keytool -genkeypair -alias pac4j -keypass pac4j-demo-password \
   -storepass pac4j-demo-password -keyalg RSA -keysize 2048 -validity 3650
 ```
 
-6. Set up gerrit site using latest released gerrit.war and select OAUTH
+7. Set up gerrit site using latest released gerrit.war and select OAUTH
 authentication scheme using:
 
 ```bash
   $ java -jar gerrit.war init -d gerrit_site_oauth
 ```
 
-7. Build saml module from this change (it's not merged yet) in gerrit tree:
+8. Build saml module from this change (it's not merged yet) in gerrit tree:
 https://gerrit-review.googlesource.com/c/plugins/saml/+/212177.
 
 ```
@@ -77,18 +92,17 @@ https://gerrit-review.googlesource.com/c/plugins/saml/+/212177.
   $ bazel build plugins/saml
 ```
 
-8. Copy saml.jar module to <gerrit_site>/lib.
+9. Copy saml.jar module to <gerrit_site>/lib.
 
-9. Start gerrit using: `<gerrit_site>/bin/gerrit.sh start`
+10. Start gerrit using: `<gerrit_site>/bin/gerrit.sh start`
 
-10. Enter gerrit URL in browser: http://localhost:8081 and hit "Sign In" button
+11. Enter gerrit URL in browser: http://localhost:8081 and hit "Sign In" button
 
-11. Keycloak Login Dialog should appear
+12. Keycloak Login Dialog should appear
 
-12. Enter user: "jdoe" and password: "secret"
+13. Enter user: "jdoe" and password: "secret"
 
-13. You are redirected to gerrit and the first user/admin John Doe is created
+14. You are redirected to gerrit and the first user/admin John Doe is created
 in gerrit with the right user name and email address.
 
-14. Congrats, you have Gerrit / Keycloak OAuth2 integration up and running.
-
+15. Congrats, you have Gerrit / Keycloak OAuth2 integration up and running.
